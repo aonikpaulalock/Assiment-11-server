@@ -18,11 +18,21 @@ app.get("/", (req, res) => {
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.orcjh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 function run() {
-  try{
-    client.connect()
-    const carCollection = client.db("carUser").collection("stokes");
+  try {
+       client.connect()
+    const carCollection = client.db("CarUser").collection("stokes");
+
+    // Load Default Cars
+    app.get("/products", async(req, res) => {
+      const quary = {} ;
+      const cursor = carCollection.find(quary);
+      const result = await cursor.toArray()
+      res.send(result) ;
+    })
+
+
   }
-  catch{
+  catch {
 
   }
 }
