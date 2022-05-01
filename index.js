@@ -38,7 +38,7 @@ function run() {
       res.send(products)
     })
 
-    // Update Delevary Data
+    // Update Delevary incresse and decrease Data
     app.put("/product/:id", async (req, res) => {
       const reqRecive = req.body;
       const id = req.params.id;
@@ -53,6 +53,14 @@ function run() {
       res.send(result)
     })
 
+
+    // Add Data Post Api
+    app.post("/productAdd", async (req, res) => {
+      const reqPost = req.body;
+      console.log(reqPost);
+      const result = await carCollection.insertOne(reqPost);
+      res.send(result)
+    })
 
   }
   catch {
