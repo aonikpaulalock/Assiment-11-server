@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 5000;
-const ObjectId = require("mongodb").ObjectId ;
+const ObjectId = require("mongodb").ObjectId;
 
 // MiddleWare
 app.use(cors())
@@ -31,11 +31,26 @@ function run() {
     })
 
     // Spacipic id Load Data
-    app.get("/product/:id",async (req, res) => {
+    app.get("/product/:id", async (req, res) => {
       const id = req.params.id;
       const quary = { _id: ObjectId(id) }
       const products = await carCollection.findOne(quary);
       res.send(products)
+    })
+
+    // Update Delevary Data
+    app.put("/product/:id", async (req, res) => {
+      const reqRecive = req.body;
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          quantity: reqRecive.quantity,
+        },
+      };
+      const result = await carCollection.updateOne(query, updateDoc, options);
+      res.send(result)
     })
 
 
