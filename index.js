@@ -62,6 +62,14 @@ function run() {
       res.send(result)
     })
 
+    // Delete Api
+    app.delete("/productDelete/:id", async (req, res) => {
+      const deleteReq = req.params.id;
+      const query = { _id: ObjectId(deleteReq) }
+      const result = await carCollection.deleteOne(query);
+      res.send(result)
+    })
+
   }
   catch {
 
