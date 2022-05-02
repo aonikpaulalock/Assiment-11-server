@@ -21,11 +21,14 @@ function run() {
   try {
     client.connect()
     const carCollection = client.db("CarUser").collection("stokes");
+    const myAddCollection = client.db("MyItems").collection("items");
 
     // Load Default Cars
     app.get("/products", async (req, res) => {
-      const quary = {};
-      const cursor = carCollection.find(quary);
+      // const email = req.query.email;
+      // const query = { email }
+      const query = {};
+      const cursor = carCollection.find(query);
       const result = await cursor.toArray()
       res.send(result);
     })
@@ -62,6 +65,14 @@ function run() {
       res.send(result)
     })
 
+    app.get("/productAddPerEmail", async (req, res) => {
+        const email = req.query.email ;
+        const query = { email }
+        const cursor = carCollection.find(query);
+        const result = await cursor.toArray()
+        res.send(result);
+    })
+
     // Delete Api
     app.delete("/productDelete/:id", async (req, res) => {
       const deleteReq = req.params.id;
@@ -69,6 +80,25 @@ function run() {
       const result = await carCollection.deleteOne(query);
       res.send(result)
     })
+
+
+    // // My Items Api
+    // app.post("/myItem", async (req, res) => {
+    //   const myItems = req.body;
+    //   const result = await myAddCollection.insertOne(myItems);
+    //   res.send(result)
+    // })
+
+
+    // // My Items Get Api
+    // app.get("/myItems", async (req, res) => {
+    //   const email = req.query.email ;
+    //   const query = {email}
+    //   const cursor = myAddCollection.find(query)
+    //   const result = await cursor.toArray()
+    //   res.send(result)
+    // })
+
 
   }
   catch {
