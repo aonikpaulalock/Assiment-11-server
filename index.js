@@ -19,6 +19,9 @@ app.get("/", (req, res) => {
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.orcjh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
+
+
+// Jwt Verify Access
 function jwtVerify(req, res, next) {
   const headerAuth = req?.headers?.authorization;
   if (!headerAuth) {
@@ -80,7 +83,6 @@ function run() {
       res.send(result)
     })
 
-
     // Add Data Post Api
     app.post("/productAdd", async (req, res) => {
       const reqPost = req.body;
@@ -88,17 +90,8 @@ function run() {
       const result = await carCollection.insertOne(reqPost);
       res.send(result)
     })
-
-    // app.get("/productAddPerEmail", async (req, res) => {
-    //   const email = req.query.email;
-    //   const query = { email }
-    //   const cursor = carCollection.find(query);
-    //   const result = await cursor.toArray()
-    //   res.send(result);
-    // })
     app.get("/productAddPerEmail", jwtVerify, async (req, res) => {
       const emailDecoded = req.decoded?.email;
-      console.log(emailDecoded);
       const email = req.query.email;
       if (email === emailDecoded) {
         const query = { email }
@@ -125,8 +118,6 @@ function run() {
   }
 }
 run()
-
-
 
 // App Listen
 app.listen(port, () => {
