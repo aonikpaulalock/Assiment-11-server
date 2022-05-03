@@ -20,7 +20,6 @@ const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@c
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 
-
 // Jwt Verify Access
 function jwtVerify(req, res, next) {
   const headerAuth = req?.headers?.authorization;
@@ -92,7 +91,7 @@ function run() {
     })
     app.get("/productAddPerEmail", jwtVerify, async (req, res) => {
       const emailDecoded = req.decoded?.email;
-      const email = req.query.email;
+      const email = req.query?.email;
       if (email === emailDecoded) {
         const query = { email }
         const cursor = carCollection.find(query);
