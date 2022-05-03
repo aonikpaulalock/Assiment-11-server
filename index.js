@@ -1,6 +1,7 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const express = require('express');
 const app = express();
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const port = process.env.PORT || 5000;
 const ObjectId = require("mongodb").ObjectId;
@@ -17,16 +18,39 @@ app.get("/", (req, res) => {
 
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.orcjh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+function jwtVerify(req, res, next) {
+  const headerAuth = req?.headers?.authorization;
+  if (!headerAuth) {
+    return res.status(401).send({ message: "Unauthorization Access" })
+  }
+  const token = headerAuth.split(' ')[1];
+  jwt.verify(token, process.env.JSON_TOKEN, (err, decoded) => {
+    if (err) {
+      return res.status(403).send("Forbidden Access")
+    }
+    else {
+      req.decoded = decoded;
+      next()
+    }
+  })
+}
+
 function run() {
   try {
     client.connect()
-    const carCollection = client.db("CarUser").collection("stokes");
-    const myAddCollection = client.db("MyItems").collection("items");
+    const carCollection = client.db("CarUser").collection("stokes");;
+
+    // jwt Token Api
+    app.post("/login", async (req, res) => {
+      const tokenRecive = req.body;
+      const tokenAccess = jwt.sign(tokenRecive, process.env.JSON_TOKEN)
+      res.send({ tokenAccess })
+    })
+
 
     // Load Default Cars
     app.get("/products", async (req, res) => {
-      // const email = req.query.email;
-      // const query = { email }
       const query = {};
       const cursor = carCollection.find(query);
       const result = await cursor.toArray()
@@ -65,12 +89,26 @@ function run() {
       res.send(result)
     })
 
-    app.get("/productAddPerEmail", async (req, res) => {
-        const email = req.query.email ;
+    // app.get("/productAddPerEmail", async (req, res) => {
+    //   const email = req.query.email;
+    //   const query = { email }
+    //   const cursor = carCollection.find(query);
+    //   const result = await cursor.toArray()
+    //   res.send(result);
+    // })
+    app.get("/productAddPerEmail", jwtVerify, async (req, res) => {
+      const emailDecoded = req.decoded?.email;
+      console.log(emailDecoded);
+      const email = req.query.email;
+      if (email === emailDecoded) {
         const query = { email }
         const cursor = carCollection.find(query);
         const result = await cursor.toArray()
         res.send(result);
+      }
+      else {
+        res.status(403).send({ message: "UnAutherization Access" })
+      }
     })
 
     // Delete Api
@@ -80,25 +118,6 @@ function run() {
       const result = await carCollection.deleteOne(query);
       res.send(result)
     })
-
-
-    // // My Items Api
-    // app.post("/myItem", async (req, res) => {
-    //   const myItems = req.body;
-    //   const result = await myAddCollection.insertOne(myItems);
-    //   res.send(result)
-    // })
-
-
-    // // My Items Get Api
-    // app.get("/myItems", async (req, res) => {
-    //   const email = req.query.email ;
-    //   const query = {email}
-    //   const cursor = myAddCollection.find(query)
-    //   const result = await cursor.toArray()
-    //   res.send(result)
-    // })
-
 
   }
   catch {
@@ -111,5 +130,5 @@ run()
 
 // App Listen
 app.listen(port, () => {
-  console.log("O mai God ja Hard Assiment", port);
+  console.log("Maigo Mai Ja kotin Assiment", port);
 })
