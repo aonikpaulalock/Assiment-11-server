@@ -11,15 +11,6 @@ app.use(cors())
 app.use(express.json())
 require('dotenv').config()
 
-app.get("/", (req, res) => {
-  res.send("MataNosto Assiment")
-})
-
-// Client-Connect
-const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.orcjh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-
-
 // Jwt Verify Access
 function jwtVerify(req, res, next) {
   const headerAuth = req?.headers?.authorization;
@@ -38,6 +29,15 @@ function jwtVerify(req, res, next) {
   })
 }
 
+app.get("/", (req, res) => {
+  res.send({ success: "MataNosto Assiment" })
+})
+
+// Client-Connect
+const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.orcjh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+
 function run() {
   try {
     client.connect()
@@ -50,7 +50,6 @@ function run() {
       res.send({ tokenAccess })
     })
 
-
     // Load Default Cars
     app.get("/products", async (req, res) => {
       const query = {};
@@ -59,6 +58,8 @@ function run() {
       res.send(result);
     })
 
+
+
     // Spacipic id Load Data
     app.get("/product/:id", async (req, res) => {
       const id = req.params.id;
@@ -66,6 +67,8 @@ function run() {
       const products = await carCollection.findOne(quary);
       res.send(products)
     })
+    
+
 
     // Update Delevary incresse and decrease Data
     app.put("/product/:id", async (req, res) => {
@@ -89,6 +92,7 @@ function run() {
       const result = await carCollection.insertOne(reqPost);
       res.send(result)
     })
+    // 
     app.get("/productAddPerEmail", jwtVerify, async (req, res) => {
       const emailDecoded = req.decoded?.email;
       const email = req.query?.email;
@@ -121,4 +125,4 @@ run()
 // App Listen
 app.listen(port, () => {
   console.log("Maigo Mai Ja kotin Assiment", port);
-})
+});
