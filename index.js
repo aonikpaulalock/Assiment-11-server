@@ -122,7 +122,9 @@ function run() {
 }
 run()
 
-// App Listen
+// App Listeninh
 app.listen(port, () => {
   console.log("Maigo Mai Ja kotin Assiment", port);
 });
+
+// https://stackoverflow.com/questions/72109773/how-can-i-solve-heroku-application-heroku-log-tais-error..................
